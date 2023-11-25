@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tuning Calculator</title>
+</head>
+<style>
+    .main {
+        background-color: #2b2b2b;
+        background-image: linear-gradient(to bottom, #514e45, #2b2b2b);
+        background-repeat: no-repeat;
+        padding: 30px;
+        width: auto;
+        height: 100%;
+        min-height: 100%;
+        display: flex;
+        text-align: center;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+    }
+    .wrapper-outer {
+        display: flex;
+        justify-content: left;
+    }
+    .wrapper-left {
+        display: inline-block;
+        width: 50%;
+    }
+    .wrapper-right {
+        display: inline-block;
+        margin-left: 50%;
+        width: 50%;
+    }
+    .card {
+        background-color: #ebe7de;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        border-radius: 20px;
+        font-size: larger;
+        padding: 5%;
+        width: 70%;
+        vertical-align: middle;
+    }
+    .card-element {
+        background-color: floralwhite;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        border-radius: 15px;
+        font-size: larger;
+        padding: 10px;
+        margin: 10px;
+        width: 100%;
+        vertical-align: middle;
+    }
+    .btn {
+        border-radius: 5px;
+        color: white;
+        padding: 5px;
+        margin: 5px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+        display: inline-block;
+    }
+    .option-btn {
+        border-style: solid;
+        border-color: darkred;
+        background-color: brown;
+    }
+    .option-btn:hover {
+        background-color: darkred;
+    }
+    .tuning-btn {
+        border-style: solid;
+        border-color: darkblue;
+        background-color: darkslateblue;
+    }
+    .tuning-btn:hover {
+        background-color: darkblue;
+    }
+    #go-btn {
+        border-style: solid;
+        border-color: darkgreen;
+        background-color: darkolivegreen;
+        padding-right: 10px;
+        padding-left: 10px;
+        font-size: x-large;
+        height: 100%;
+        vertical-align: middle;
+    }
+    #go-btn:hover {
+        background-color: darkgreen;
+    }
+    #results {
+        background-color: white;
+        font-size: x-large;
+        padding: 10px;
+        margin: 5px;
+        width: 80%;
+        display: flex;
+    }
+    select {
+        font-size: x-large;
+        margin: 5px;
+    }
+</style>
+
+<body class="main">
+
+<div class="card">
+
+    <h1>Banjo Tuning Calculator</h1>
+    <hr/>
+
+    <div class="wrapper-outer">
+        <div class="wrapper-left">
+            <div class="card-element">
+            Use <a class="btn option-btn" id="sharpFlat-btn"><span id="sharp-flat">SHARPS</span></a><br>
+            <p>
+                Tune
+                <a class="btn option-btn" id="upDown-btn"><span id="up-or-down">UP</span></a><br>
+                <select id="offset">
+                    <option value="1">0.5</option>
+                    <option value="2">1</option>
+                    <option value="3">1.5</option>
+                    <option value="4">2</option>
+                    <option value="5">2.5</option>
+                    <option value="6">3</option>
+                    <option value="7">3.5</option>
+                    <option value="8">4</option>
+                    <option value="9">4.5</option>
+                    <option value="10">5</option>
+                    <option value="11">5.5</option>
+                </select>
+                Steps
+            </p>
+                </div>
+            <div class="card-element">
+                Tuning Presets:<br>
+                <a class="btn tuning-btn" id="standard">standard</a>
+                <a class="btn tuning-btn" id="modal">modal</a>
+                <a class="btn tuning-btn" id="two-finger-c">two-finger c</a>
+                <a class="btn tuning-btn" id="doublec">double c</a>
+                <a class="btn tuning-btn" id="triplec">triple c</a>
+            </div>
+        </div>
+<!--        <div class="wrapper-right">-->
+            <div class="card-element" style="margin-left: 5%;">
+                    Choose relative tuning to start at:<br>
+                <div>
+                    <select id="string5" title="5th String">
+                    </select>
+                    <select id="string4" title="4th String">
+                    </select>
+                    <select id="string3" title="3rd String">
+                    </select>
+                    <select id="string2" title="2nd String">
+                    </select>
+                    <select id="string1" title="1st String">
+                    </select>
+                </div>
+                &nbsp;
+
+                <div style="display:flex; justify-content: center;">
+                    <a class="btn" id="go-btn"> GO </a><br>
+                    <div class="card" id="results">&nbsp;</div>
+                </div>
+            </div>
+<!--        </div>-->
+
+    </div>
+
+
+</div>
+</body>
+
+<script>
+//Tuning Calculator
+
+// PAGE SETUP: ELEMENTS
+var stringFive = document.getElementById('string5');
+var stringFour = document.getElementById('string4');
+var stringThree = document.getElementById('string3');
+var stringTwo = document.getElementById('string2');
+var stringOne = document.getElementById('string1');
+var upDownToggle = document.getElementById('up-or-down');
+var upDownBtn = document.getElementById('upDown-btn');
+var sharpFlatToggle = document.getElementById('sharp-flat');
+var sharpFlatBtn = document.getElementById('sharp-flat');
+var goBtn = document.getElementById('go-btn');
+var resultDiv = document.getElementById('results');
+var presetTuning = [];
+
+
+window.onload = function () {
+    // set OPTIONS button values if they exist:
+    let sharpFlat = sessionStorage.getItem('sharpFlatToggle');
+    sharpFlatToggle.innerText = sharpFlat ? sharpFlat : "SHARPS";
+    let upDown = sessionStorage.getItem('upDownToggle');
+    upDownToggle.innerText = upDown ? upDown : "UP";
+    setTuningOptions(presetTuning);
+}
+
+// tuning to transpose - get from INPUT
+// tuning = ['g', 'D', 'G', 'Bb', 'D'];
+// console.log(tuning);
+
+// transposition offset - get from INPUT
+
+// array for the notes using sharps
+const notesLowerSharps = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
+const notesUpperSharps = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
+
+// array for the notes using flats
+const notesLowerFlats = ['a', 'bb', 'b', 'c', 'db', 'd', 'eb', 'e', 'f', 'gb', 'g', 'ab'];
+const notesUpperFlats = ['A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab'];
+
+function setTuningOptions(preset=[]) {
+    stringFive.innerHTML = loadTuningOptions(5);
+    stringFour.innerHTML = loadTuningOptions(4);
+    stringThree.innerHTML = loadTuningOptions(3);
+    stringTwo.innerHTML = loadTuningOptions(2);
+    stringOne.innerHTML = loadTuningOptions(1);
+    if (preset.length === 5) {
+        let sharps = sharpFlatToggle.innerText.toString() === "SHARPS";
+        let notesLower = sharps ? notesLowerSharps : notesLowerFlats;
+        let notesUpper = sharps ? notesUpperSharps : notesUpperFlats;
+        stringFive.selectedIndex = notesLower.indexOf(preset[0]);
+        stringFour.selectedIndex = notesUpper.indexOf(preset[1]);
+        stringThree.selectedIndex = notesUpper.indexOf(preset[2]);
+        stringTwo.selectedIndex = notesUpper.indexOf(preset[3]);
+        stringOne.selectedIndex = notesUpper.indexOf(preset[4]);
+    }
+}
+
+function loadTuningOptions(stringNum) {
+    let options = ``;
+    let sharps = sharpFlatToggle.innerText.toString() === "SHARPS";
+    let notesLower = sharps ? notesLowerSharps : notesLowerFlats;
+    let notesUpper = sharps ? notesUpperSharps : notesUpperFlats;
+    if (stringNum === 5) {
+        notesLower.forEach(note => {
+            let disp = dispNote(sharps, note);
+            options += `<option value="${note}">${disp}</option>`;
+        });
+    } else {
+        notesUpper.forEach(note => {
+            let disp = dispNote(sharps, note);
+            options += `<option value="${note}">${disp}</option>`;
+        });
+    }
+    return options;
+}
+
+function dispNote(sharps, note) {
+    let sign = sharps ? `&sharp;` : `&flat;`;
+    let disp = note.length > 1 ? note[0] + sign : note;
+    return disp;
+}
+
+function getNewTuning() {
+    let tuning = [
+        stringFive.value.toString(),
+        stringFour.value.toString(),
+        stringThree.value.toString(),
+        stringTwo.value.toString(),
+        stringOne.value.toString(),
+    ];
+    //Pass the transposition offset through the reduceOffset function to ensure it is under 12 and above -1.
+    let offset = parseInt(document.getElementById('offset').value.toString());
+    offset = upDownToggle.innerText === "DOWN" ? -offset : offset;
+    if (offset < 1 || offset > 12) {
+        offset = reducer(offset);
+    }
+    let newTuning = ``
+    tuning.forEach(noteToReplace => {
+        let newNote = ``;
+        let sharps = sharpFlatToggle.innerText.toString() === "SHARPS";
+        let notesLower = sharps ? notesLowerSharps : notesLowerFlats;
+        let notesUpper = sharps ? notesUpperSharps : notesUpperFlats;
+
+        // Find which of the arrays the note is in
+        // If found in one of the arrays, then use that array for the transposeNote function
+        // If it's not found in any of the arrays then display an error message and break
+
+        if (notesLower.includes(noteToReplace.toString())) {
+            newNote = transposeNote(notesLower, noteToReplace.toString(), offset);
+        } else if (notesUpper.includes(noteToReplace)) {
+            newNote = transposeNote(notesUpper, noteToReplace.toString(), offset);
+        } else {
+            console.log('ERROR: ', noteToReplace.toString(), ' is not a recognised note');
+            return '';
+        }
+        //Save the transposed note to the new tuning
+        newTuning += dispNote(sharps, newNote);
+    })
+    return newTuning
+}
+
+//Log the transposed tuning to the console
+// console.log(newTuning);
+
+//Function that reduces numbers (offset or letter position) to within the range of the alphabet arrays (0 to 11).
+//Add or subtract until it's in the required range
+function reducer(numToReduce) {
+    // WHY ARE THESE AT 12???
+	let reducedNumber = numToReduce;
+	while (reducedNumber >= 12) {
+	reducedNumber -= 12;
+	}
+	while (reducedNumber < 0) {
+	reducedNumber += 12;
+	}
+	return reducedNumber;
+}
+
+//Function to find the transposed. Takes an array to look up and the letter to find, returns the offset letter.
+function transposeNote(alphaArray, noteToReplace, offset) {
+	let position = alphaArray.indexOf(noteToReplace);
+	let newLocation = reducer(position + offset);
+	let offsetNote = alphaArray[newLocation];
+	return offsetNote;
+}
+
+// PAGE SETUP - Click Listeners
+upDownBtn.addEventListener('click', () => {
+    if (upDownToggle.innerText === "UP") {
+        upDownToggle.innerText = "DOWN";
+    } else if (upDownToggle.innerText === "DOWN") {
+        upDownToggle.innerText = "UP";
+    }
+});
+
+sharpFlatBtn.addEventListener('click', () => {
+    if (sharpFlatToggle.innerText === "SHARPS") {
+        sharpFlatToggle.innerText = "FLATS";
+    } else if (sharpFlatToggle.innerText === "FLATS") {
+        sharpFlatToggle.innerText = "SHARPS";
+    }
+    setTuningOptions(presetTuning);
+});
+
+goBtn.addEventListener('click', () => {
+    resultDiv.innerHTML = getNewTuning();
+})
+
+var standardBtn = document.getElementById('standard');
+var modalBtn = document.getElementById('modal');
+var twofcBtn = document.getElementById('two-finger-c');
+var doublecBtn = document.getElementById('doublec');
+var triplecBtn = document.getElementById('triplec');
+standardBtn.addEventListener('click', () => {
+    presetTuning = ['g', 'D', 'G', 'B', 'D'];
+    setTuningOptions(presetTuning);
+});
+modalBtn.addEventListener('click', () => {
+    presetTuning = ['g', 'D', 'G', 'C', 'D'];
+    setTuningOptions(presetTuning);
+});
+twofcBtn.addEventListener('click', () => {
+    presetTuning = ['g', 'C', 'G', 'B', 'D'];
+    setTuningOptions(presetTuning);
+});
+doublecBtn.addEventListener('click', () => {
+    presetTuning = ['g', 'C', 'G', 'C', 'D'];
+    setTuningOptions(presetTuning);
+});
+triplecBtn.addEventListener('click', () => {
+    presetTuning = ['g', 'C', 'G', 'C', 'C'];
+    setTuningOptions(presetTuning);
+});
+
+window.onunload = function() {
+    sessionStorage.setItem('sharpFlatToggle', sharpFlatToggle.innerText);
+    sessionStorage.setItem('upDownToggle', upDownToggle.innerText);
+}
+
+
+</script>
+
+</html>
